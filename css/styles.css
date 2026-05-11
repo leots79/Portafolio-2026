@@ -1,0 +1,605 @@
+/* ==========================================================================
+   Variables & Tokens - Minimalist Brutalist
+   ========================================================================== */
+:root {
+    /* Colors */
+    --bg-light: #fdfdfd;
+    --bg-dark: #050505;
+    --text-dark: #050505;
+    --text-light: #fdfdfd;
+    
+    /* Accents */
+    --accent-gold: #FFD700;
+    --accent-green: #61ae24;
+    --accent-blue: #0A192F; /* Reference from images for dark navy blocks */
+    
+    /* Typography */
+    --font-heading: 'Space Grotesk', sans-serif;
+    --font-body: 'Urbanist', sans-serif;
+    
+    /* Borders & Spacing */
+    --border-thick: 3px solid var(--text-dark);
+    --border-thick-light: 3px solid var(--text-light);
+    --border-gold: 3px solid var(--accent-gold);
+    --border-green: 3px solid var(--accent-green);
+    
+    --radius-none: 0px; /* Brutalism typically avoids soft corners */
+}
+
+/* ==========================================================================
+   Reset & Base Styles
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-body);
+    color: var(--text-dark);
+    background-color: var(--bg-light);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
+/* Utility Classes */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section-spacing {
+    padding: 100px 0;
+}
+
+.solid-bg {
+    background-color: var(--accent-blue);
+    color: var(--text-light);
+}
+
+.light-text {
+    color: var(--text-light);
+}
+
+.accent-gold {
+    color: var(--accent-gold);
+}
+
+.accent-green {
+    color: var(--accent-green);
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.mb-4 {
+    margin-bottom: 2rem;
+}
+
+.mt-2 {
+    margin-top: 1rem;
+}
+
+.mt-4 {
+    margin-top: 2rem;
+}
+
+.mt-6 {
+    margin-top: 4rem;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.small-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Grid Layouts */
+.grid-2-col {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+}
+
+@media (min-width: 768px) {
+    .grid-2-col {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.grid-3-col {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 768px) {
+    .grid-3-col {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.align-center {
+    align-items: center;
+}
+
+/* ==========================================================================
+   Components
+   ========================================================================== */
+
+/* Navigation */
+.brutalist-nav {
+    border-bottom: var(--border-thick);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    background: var(--bg-light);
+    z-index: 100;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.05em;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-links a {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    position: relative;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--text-dark);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+.nav-links a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* Hero Section */
+.hero {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    border-bottom: var(--border-thick);
+    background-color: var(--bg-light);
+    background-image: radial-gradient(var(--text-dark) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: -19px -19px;
+}
+
+.hero-title {
+    font-size: clamp(3rem, 8vw, 6rem);
+    margin-bottom: 1rem;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    color: var(--accent-blue);
+}
+
+.hero-subtitle {
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    font-weight: 500;
+    margin-bottom: 3rem;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--accent-green);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    background: var(--bg-light);
+}
+
+.badge-dot {
+    width: 10px;
+    height: 10px;
+    background-color: var(--accent-green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Sections Base */
+.section-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    margin-bottom: 1rem;
+}
+
+.section-subtitle {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 3rem;
+}
+
+/* About Section */
+.about-content {
+    background-color: var(--bg-light);
+}
+
+.body-text {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.highlight-box {
+    border: var(--border-thick);
+    padding: 1.5rem;
+    margin-top: 2rem;
+    background-color: var(--accent-gold);
+}
+
+.highlight-text {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    color: var(--text-dark);
+}
+
+.brutalist-image-container {
+    border: var(--border-thick);
+    height: 100%;
+    min-height: 400px;
+    position: relative;
+    background-color: var(--text-dark);
+}
+
+.brutalist-image-container::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 100%;
+    height: 100%;
+    border: var(--border-thick);
+    z-index: -1;
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #E0E0E0;
+    border: var(--border-thick);
+    color: var(--text-dark);
+    font-weight: 700;
+}
+
+/* Cards */
+.brutalist-card {
+    border: var(--border-thick);
+    padding: 2rem;
+    background: var(--bg-light);
+    transition: transform 0.2s ease;
+    height: 100%;
+}
+
+.brutalist-card:hover {
+    transform: translate(-5px, -5px);
+    box-shadow: 5px 5px 0px var(--text-dark);
+}
+
+.brutalist-card.dark {
+    background: var(--bg-dark);
+    border: var(--border-thick-light);
+}
+
+.brutalist-card.dark:hover {
+    box-shadow: 5px 5px 0px var(--accent-gold);
+}
+
+.brutalist-card.outlined-gold {
+    border: var(--border-gold);
+}
+
+.brutalist-card.outlined-green {
+    border: var(--border-green);
+}
+
+.card-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Card Links and Images */
+.card-link {
+    display: block;
+    height: 100%;
+}
+
+.brutalist-card.has-image {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-image-wrapper {
+    width: 100%;
+    margin-bottom: 1rem;
+    border: var(--border-thick-light);
+    overflow: hidden;
+}
+
+.card-image-wrapper.border-gold {
+    border: var(--border-gold);
+}
+
+.card-image-wrapper.border-green {
+    border: var(--border-green);
+}
+
+.card-img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(100%);
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.brutalist-card:hover .card-img {
+    filter: grayscale(0%);
+    transform: scale(1.05);
+}
+
+.skill-category {
+    margin-bottom: 4rem;
+}
+
+.category-title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--text-light);
+    padding-bottom: 0.5rem;
+    display: inline-block;
+}
+
+/* Soft Skills List */
+.list-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.list-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.list-icon {
+    width: 24px;
+    height: 24px;
+    background-color: var(--accent-gold);
+    border: 2px solid var(--text-dark);
+    flex-shrink: 0;
+    margin-top: 5px;
+}
+
+.list-title {
+    font-size: 1.2rem;
+    margin-bottom: 0.2rem;
+}
+
+.soft-skills-decoration {
+    position: relative;
+    height: 100%;
+    min-height: 300px;
+}
+
+.brutal-shape {
+    position: absolute;
+    border: var(--border-thick);
+}
+
+.box-1 {
+    width: 60%;
+    height: 60%;
+    background-color: var(--accent-green);
+    top: 10%;
+    left: 10%;
+    z-index: 2;
+}
+
+.box-2 {
+    width: 50%;
+    height: 70%;
+    background-color: var(--accent-gold);
+    bottom: 10%;
+    right: 10%;
+    z-index: 1;
+}
+
+/* Projects Table */
+.case-table-container {
+    overflow-x: auto;
+    border: var(--border-thick-light);
+    background: var(--bg-light);
+    color: var(--text-dark);
+}
+
+.brutalist-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.brutalist-table th, 
+.brutalist-table td {
+    padding: 1.5rem;
+    border-bottom: 2px solid var(--text-dark);
+    border-right: 2px solid var(--text-dark);
+    text-align: left;
+}
+
+.brutalist-table th:last-child,
+.brutalist-table td:last-child {
+    border-right: none;
+}
+
+.brutalist-table tr:last-child td {
+    border-bottom: none;
+}
+
+.brutalist-table th {
+    font-family: var(--font-heading);
+    background-color: var(--accent-blue);
+    color: var(--text-light);
+    text-transform: uppercase;
+    font-size: 1.1rem;
+}
+
+.case-title {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: var(--accent-gold);
+}
+
+/* Buttons */
+.brutalist-btn {
+    display: inline-block;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.2rem;
+    padding: 1rem 2.5rem;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    border: var(--border-thick);
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+}
+
+.brutalist-btn:hover {
+    background-color: var(--accent-gold);
+    transform: translate(-4px, -4px);
+    box-shadow: 4px 4px 0px var(--text-dark);
+}
+
+.brutalist-btn.primary {
+    background-color: var(--accent-gold);
+}
+
+.brutalist-btn.primary:hover {
+    background-color: var(--accent-green);
+}
+
+/* Footer */
+.footer {
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    border-top: var(--border-thick-light);
+}
+
+.footer-title {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    color: var(--accent-gold);
+    margin-bottom: 1.5rem;
+}
+
+.footer-subtitle {
+    font-size: 1.3rem;
+    max-width: 800px;
+    margin: 0 auto 3rem auto;
+}
+
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.delay-1 {
+    transition-delay: 0.2s;
+}
+
+.delay-2 {
+    transition-delay: 0.4s;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none; /* Can be replaced with a hamburger menu later */
+    }
+    
+    .section-spacing {
+        padding: 60px 0;
+    }
+    
+    .brutalist-image-container::before {
+        display: none;
+    }
+    
+    .brutalist-table th, 
+    .brutalist-table td {
+        padding: 1rem;
+        font-size: 0.9rem;
+    }
+}
