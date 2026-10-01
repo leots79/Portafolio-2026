@@ -1,0 +1,46 @@
+====================================================================
+ GUÍA DE MEDIDAS Y ESPECIFICACIONES PARA COVERS DE PROYECTOS
+ Portafolio 2026 - Leonardo García
+====================================================================
+
+1. MEDIDAS Y RESOLUCIÓN RECOMENDADA (CANVAS)
+--------------------------------------------------------------------
+• Medida Estándar Recomendada: 1200 x 675 píxeles (16:9)
+  -> Es la medida estándar profesional para Figma, Photoshop o Canva.
+  -> Garantiza nitidez HD / Retina en pantallas de escritorio y móviles.
+
+• Medida Alternativa (Más Altura): 1200 x 750 píxeles (16:10)
+  -> Usar si la interfaz o mockup necesita más área vertical.
+
+
+2. ÁREA SEGURA Y COMPOSICIÓN (SAFE ZONE)
+--------------------------------------------------------------------
+• Margen de Seguridad (80% Central):
+  Mantén los elementos clave (mockups de UI, logos, capturas principales)
+  en el centro de la imagen, dejando al menos un 10% de margen transparente 
+  o de fondo en los bordes.
+
+• Esquina Superior Derecha Libre:
+  Evita colocar información importante en la esquina superior derecha,
+  ya que ahí se superpone la etiqueta de categoría (DESARROLLO WEB,
+  MOTION GRAPHICS, FOTOGRAFÍA, etc.).
+
+
+3. FORMATOS Y OPTIMIZACIÓN DE ARCHIVO
+--------------------------------------------------------------------
+• Formato recomendado: .webp (o .jpg optimizado al 80%-85%).
+• Peso recomendado: Menor a 250 KB por imagen.
+• Ruta donde guardar imágenes en el proyecto:
+  IMG-Proyectos/Proyectossss/
+
+
+4. COMPORTAMIENTO EN EL CÓDIGO (CSS / HTML)
+--------------------------------------------------------------------
+• El contenedor .featured-image tiene configurado:
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+
+• Esto garantiza que las portadas diseñadas a 1200x675 px encajen
+  automáticamente en 2 columnas (Escritorio) y 1 columna (Móvil)
+  sin deformarse ni perder proporción.
+====================================================================

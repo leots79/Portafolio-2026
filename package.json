@@ -1,0 +1,8 @@
+{
+  "name": "portafolio-04",
+  "version": "1.0.0",
+  "description": "Portafolio de Leonardo García",
+  "scripts": {
+    "update-logos": "node scripts/update-logos.js"
+  }
+}
