@@ -1,2 +1,6 @@
 # Exclude large files exceeding GitHub's 100MB limit
 *EstudiantesMatriz*
+
+# Exclude heavy raw videos, keep optimized web videos
+Videos/*.mp4
+

@@ -59,6 +59,9 @@ document.addEventListener('DOMContentLoaded', () => {
     */
     // 4. Dynamic Logo Carousel Auto-Loader
     initLogoCarousel();
+
+    // 5. Vertical Reels 9:16 Carousel
+    initReelsCarousel();
 });
 
 async function initLogoCarousel() {
@@ -136,4 +139,185 @@ async function initLogoCarousel() {
         <div class="carousel-content">${innerHTML}</div>
         <div class="carousel-content" aria-hidden="true">${innerHTML}</div>
     `;
+}
+
+// 5. Vertical Reels 9:16 Carousel Controller
+function initReelsCarousel() {
+    const track = document.getElementById('reels-track');
+    const prevBtn = document.getElementById('reels-prev-btn');
+    const nextBtn = document.getElementById('reels-next-btn');
+    const shuffleBtn = document.getElementById('reels-shuffle-btn');
+
+    if (!track) return;
+
+    const playIconUrl = 'https://cdn.jsdelivr.net/npm/lucide-static@0.469.0/icons/play.svg';
+    const pauseIconUrl = 'https://cdn.jsdelivr.net/npm/lucide-static@0.469.0/icons/pause.svg';
+
+    // 1. Randomization / Shuffle logic
+    const shuffleReelCards = (smoothScroll = false) => {
+        const cards = Array.from(track.querySelectorAll('.reel-card'));
+        if (cards.length <= 1) return;
+
+        // Pause any active playback before shuffling
+        cards.forEach(card => {
+            const video = card.querySelector('.reel-video');
+            if (video && !video.paused) {
+                video.pause();
+            }
+            card.classList.remove('is-playing');
+            const playIcon = card.querySelector('.play-icon');
+            if (playIcon) playIcon.src = playIconUrl;
+        });
+
+        // Fisher-Yates shuffle
+        for (let i = cards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [cards[i], cards[j]] = [cards[j], cards[i]];
+        }
+
+        cards.forEach(card => track.appendChild(card));
+
+        if (smoothScroll) {
+            track.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+            track.scrollLeft = 0;
+        }
+    };
+
+    // Shuffle automatically on initial load
+    shuffleReelCards(false);
+
+    // Shuffle button click event
+    if (shuffleBtn) {
+        shuffleBtn.addEventListener('click', () => {
+            shuffleReelCards(true);
+            shuffleBtn.style.transform = 'rotate(180deg)';
+            setTimeout(() => {
+                shuffleBtn.style.transform = '';
+            }, 300);
+        });
+    }
+
+    const getScrollStep = () => {
+        const firstCard = track.querySelector('.reel-card');
+        return firstCard ? firstCard.offsetWidth + 24 : 320;
+    };
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            track.scrollBy({ left: -getScrollStep(), behavior: 'smooth' });
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            track.scrollBy({ left: getScrollStep(), behavior: 'smooth' });
+        });
+    }
+
+    // Video Play/Pause & Single Active Playback
+    let hasDragged = false;
+    let isDown = false;
+    let startX = 0;
+    let scrollLeft = 0;
+
+    const reelCards = track.querySelectorAll('.reel-card');
+
+    reelCards.forEach(card => {
+        const video = card.querySelector('.reel-video');
+        const playBtn = card.querySelector('.reel-play-btn');
+        const playIcon = playBtn ? playBtn.querySelector('.play-icon') : null;
+
+        if (!video) return;
+
+        const pauseCurrentVideo = () => {
+            video.pause();
+            card.classList.remove('is-playing');
+            if (playIcon) playIcon.src = playIconUrl;
+        };
+
+        const togglePlayback = (e) => {
+            if (hasDragged) return; // Prevent toggle if user was scrolling/dragging
+
+            if (!video.paused) {
+                pauseCurrentVideo();
+            } else {
+                // Pause all other videos
+                const allCards = track.querySelectorAll('.reel-card');
+                allCards.forEach(otherCard => {
+                    if (otherCard !== card) {
+                        const otherVideo = otherCard.querySelector('.reel-video');
+                        const otherPlayIcon = otherCard.querySelector('.play-icon');
+                        if (otherVideo && !otherVideo.paused) {
+                            otherVideo.pause();
+                            otherCard.classList.remove('is-playing');
+                            if (otherPlayIcon) otherPlayIcon.src = playIconUrl;
+                        }
+                    }
+                });
+
+                // Play this video
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => {
+                            card.classList.add('is-playing');
+                            if (playIcon) playIcon.src = pauseIconUrl;
+                        })
+                        .catch(err => {
+                            console.warn('Reproducción bloqueada o postergada por el navegador:', err);
+                        });
+                }
+            }
+        };
+
+        const frame = card.querySelector('.reel-frame');
+        if (frame) {
+            frame.addEventListener('click', togglePlayback);
+        }
+        if (playBtn) {
+            playBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                togglePlayback(e);
+            });
+        }
+
+        // Reset icon when video ends naturally
+        video.addEventListener('ended', () => {
+            card.classList.remove('is-playing');
+            if (playIcon) playIcon.src = playIconUrl;
+        });
+    });
+
+    // Mouse drag-to-scroll interaction for desktop
+    track.addEventListener('mousedown', (e) => {
+        isDown = true;
+        hasDragged = false;
+        startX = e.pageX - track.offsetLeft;
+        scrollLeft = track.scrollLeft;
+        track.style.cursor = 'grabbing';
+    });
+
+    track.addEventListener('mouseleave', () => {
+        isDown = false;
+        track.style.cursor = '';
+    });
+
+    track.addEventListener('mouseup', () => {
+        isDown = false;
+        track.style.cursor = '';
+        setTimeout(() => {
+            hasDragged = false;
+        }, 50);
+    });
+
+    track.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        const x = e.pageX - track.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        if (Math.abs(x - startX) > 8) {
+            hasDragged = true;
+        }
+        track.scrollLeft = scrollLeft - walk;
+    });
 }
