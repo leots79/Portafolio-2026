@@ -1,3 +1,10 @@
+// ====================================================================
+// CONFIGURACIÓN DE CDN PARA MULTIMEDIA (VIDEOS Y ASSETS PESADOS)
+// ====================================================================
+// En local: déjalo vacío '' para usar rutas relativas locales.
+// En producción: asigna tu CDN (ej: 'https://cdn.tudominio.com/')
+window.MEDIA_CDN_BASE = '';
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Intersection Observer for fade-in animations on scroll
     const observerOptions = {
@@ -6,12 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
         threshold: 0.15 // Trigger when 15% of the element is visible
     };
 
-    const observer = new IntersectionObserver((entries, observer) => {
+    const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
-                // Optional: Stop observing once it's visible to only animate once
-                // observer.unobserve(entry.target);
+                // Dejar de observar para liberar memoria y CPU tras animar
+                obs.unobserve(entry.target);
             }
         });
     }, observerOptions);
@@ -70,44 +77,17 @@ async function initLogoCarousel() {
 
     let logoFiles = [];
 
-    // Estrategia 1: Intentar leer el directorio directamente (funciona en servidores locales de dev)
+    // Carga directa de la lista de logos optimizados en WebP
     try {
-        const dirResponse = await fetch('IMG-Logos/');
-        if (dirResponse.ok) {
-            const htmlText = await dirResponse.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlText, 'text/html');
-            const links = Array.from(doc.querySelectorAll('a'));
-            
-            const discoveredFiles = links
-                .map(link => link.getAttribute('href'))
-                .filter(href => href && /\.(png|jpe?g|svg|webp)$/i.test(href))
-                .map(href => {
-                    const cleanName = href.split('/').pop().split('?')[0];
-                    return decodeURIComponent(cleanName);
-                });
-
-            if (discoveredFiles.length > 0) {
-                logoFiles = [...new Set(discoveredFiles)];
-            }
+        const jsonResponse = await fetch('IMG-Logos/logos.json');
+        if (jsonResponse.ok) {
+            logoFiles = await jsonResponse.json();
         }
     } catch (e) {
-        // En servidores de producción estáticos la lectura directa de carpetas puede no estar permitida
+        console.warn('No se pudo cargar logos.json:', e);
     }
 
-    // Estrategia 2: Si no hubo lectura directa, cargar desde IMG-Logos/logos.json
-    if (logoFiles.length === 0) {
-        try {
-            const jsonResponse = await fetch('IMG-Logos/logos.json');
-            if (jsonResponse.ok) {
-                logoFiles = await jsonResponse.json();
-            }
-        } catch (e) {
-            console.warn('No se pudo cargar logos.json:', e);
-        }
-    }
-
-    // Si ambas estrategias fallan, mantener el HTML por defecto renderizado en index.html
+    // Si falla la carga, mantener el HTML estático de respaldo
     if (!logoFiles || logoFiles.length === 0) return;
 
     // Función auxiliar para generar atributo alt limpio
@@ -127,7 +107,7 @@ async function initLogoCarousel() {
     const buildContentHTML = () => {
         return renderList.map(file => `
             <span class="brand-logo-item">
-                <img src="IMG-Logos/${encodeURIComponent(file)}" alt="${formatAlt(file)}" class="brand-logo-img" loading="lazy">
+                <img src="IMG-Logos/${encodeURIComponent(file)}" alt="${formatAlt(file)}" class="brand-logo-img" width="140" height="45" loading="lazy" decoding="async">
             </span>
             <span class="brand-separator">✦</span>
         `).join('');
@@ -150,8 +130,8 @@ function initReelsCarousel() {
 
     if (!track) return;
 
-    const playIconUrl = 'https://cdn.jsdelivr.net/npm/lucide-static@0.469.0/icons/play.svg';
-    const pauseIconUrl = 'https://cdn.jsdelivr.net/npm/lucide-static@0.469.0/icons/pause.svg';
+    const playIconUrl = 'iconos/lucide/play.svg';
+    const pauseIconUrl = 'iconos/lucide/pause.svg';
 
     // 1. Randomization / Shuffle logic
     const shuffleReelCards = (smoothScroll = false) => {
@@ -256,6 +236,13 @@ function initReelsCarousel() {
                     }
                 });
 
+                // Carga bajo demanda (Facade Pattern): solo inyectar src al hacer clic
+                if (!video.getAttribute('src') && video.dataset.src) {
+                    const fullVideoUrl = (window.MEDIA_CDN_BASE || '') + video.dataset.src;
+                    video.src = fullVideoUrl;
+                    video.load();
+                }
+
                 // Play this video
                 const playPromise = video.play();
                 if (playPromise !== undefined) {
@@ -311,6 +298,7 @@ function initReelsCarousel() {
         }, 50);
     });
 
+    let rafId = null;
     track.addEventListener('mousemove', (e) => {
         if (!isDown) return;
         const x = e.pageX - track.offsetLeft;
@@ -318,6 +306,26 @@ function initReelsCarousel() {
         if (Math.abs(x - startX) > 8) {
             hasDragged = true;
         }
-        track.scrollLeft = scrollLeft - walk;
+
+        // Throttle con requestAnimationFrame para sincronizar con la tasa de refresco (60/120Hz)
+        if (!rafId) {
+            rafId = requestAnimationFrame(() => {
+                track.scrollLeft = scrollLeft - walk;
+                rafId = null;
+            });
+        }
     });
+}
+
+// Utilidad de Debounce para campos de texto, inputs de búsqueda y eventos resize
+function debounce(func, wait = 150) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func.apply(this, args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 }

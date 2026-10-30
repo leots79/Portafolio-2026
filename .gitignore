@@ -4,3 +4,6 @@
 # Exclude heavy raw videos, keep optimized web videos
 Videos/*.mp4
 
+# Dependencies
+node_modules/
+package-lock.json
